@@ -219,3 +219,6 @@ execl("/bin/bash","bash",argv[4],NULL);
 ```
 yang berarti kita menjalankan bash script yang pathnya merupakan `argv[4]`.
 
+## Soal 2
+
+## Soal 3

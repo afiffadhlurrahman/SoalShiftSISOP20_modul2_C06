@@ -231,7 +231,6 @@ execl("/bin/bash","bash",argv[4],NULL);
 yang berarti kita menjalankan bash script yang pathnya merupakan `argv[4]`.
 
 ## Soal 2
-```
 Shisoppu mantappu! itulah yang selalu dikatakan Kiwa setiap hari karena sekarang dia
 merasa sudah jago materi sisop. Karena merasa jago, suatu hari Kiwa iseng membuat
 sebuah program.
@@ -271,7 +270,6 @@ Hint:
 - Gunakan fitur picsum.photos untuk mendapatkan gambar dengan ukuran
 tertentu
 - Epoch Unix bisa didapatkan dari time()
-```
 
 ### Penyelesaian no. 2
 ```

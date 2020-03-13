@@ -77,7 +77,12 @@ int main(int argc, char** argv){
     
     while(1){
         if((tm.tm_hour == hour || hourBintang) && (tm.tm_min == min || minBintang)&& (tm.tm_sec == sec || secBintang)){
-            if(fork()==0){
+            pid_t child_id1;
+            child_id1 = fork();
+            if (child_id1 < 0) {
+            exit(EXIT_FAILURE);
+            }  
+            if(child_id1==0){
                 execl("/bin/bash","bash",argv[4],NULL);
             }
         }

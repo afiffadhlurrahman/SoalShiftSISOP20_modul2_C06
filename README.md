@@ -103,7 +103,12 @@ int main(int argc, char** argv){
     while(1){
         if((tm.tm_hour == hour || hourBintang) && (tm.tm_min == min || minBintang)
           && (tm.tm_sec == sec || secBintang)){
-            if(fork()==0){
+            pid_t child_id1;
+            child_id1 = fork();
+            if (child_id1 < 0) {
+            exit(EXIT_FAILURE);
+            }  
+            if(child_id1==0){
                 execl("/bin/bash","bash",argv[4],NULL);
             }
         }
@@ -202,7 +207,12 @@ untuk melakukan ini, kita perlu melakukan checking dalam `while(1)` di process d
 ```
 if((tm.tm_hour == hour || hourBintang) && (tm.tm_min == min || minBintang)
           && (tm.tm_sec == sec || secBintang)){
-            if(fork()==0){
+            pid_t child_id1;
+            child_id1 = fork();
+            if (child_id1 < 0) {
+            exit(EXIT_FAILURE);
+            }  
+            if(child_id1==0){
                 execl("/bin/bash","bash",argv[4],NULL);
             }
         }
@@ -211,9 +221,10 @@ Kita melakukan check apakah jam saat/menit/detik saat ini sama dengan yang kita 
 
 Jika semuanya sudah terpenuhi, maka kita bisa mengeksekusi program bash dengan menggunakan `exec`. Namun sebelum melakukan `exec`, kita harus melakukan `fork()` karena seperti yang kita ketahui, `exec` akan membuat program berhenti setelah melakukan eksekusi. Maka dari itu kita harus menjalankannya di child. 
 ```
-if(fork()==0)
+pid_t child_id1;
+child_id1 = fork();
 ```
-Setelah ini, kita bisa melakukan fungsi `exec` sebagai berikut
+Setelah ini, kita bisa melakukan fungsi `exec` dalam child `if(child_id1==0)` sebagai berikut
 ```
 execl("/bin/bash","bash",argv[4],NULL);
 ```

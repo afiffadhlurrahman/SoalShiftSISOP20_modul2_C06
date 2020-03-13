@@ -401,7 +401,30 @@ int main() {
 }
 
 ```
-
+untuk killernya
+```
+void killer(char mode[]){
+    FILE *fl;
+    fl = fopen("killer.sh", "w");
+    if(strcmp(mode, "-a")==0) fprintf(fl, "#!/bin/bash\nkill -9 -%d", getpid());
+    if(strcmp(mode, "-b")==0) fprintf(fl, "#!/bin/bash\nkill %d", getpid());
+    int status;
+    pid_t child_id;
+    child_id = fork();
+    if(child_id==0){  
+        pid_t child_id2;
+        child_id2 = fork();
+        if (child_id2 == 0){
+        char *argv[] = {"chmod", "u+x", "killer.sh", NULL};
+        execv("/bin/chmod", argv);
+    }
+    else{
+      while ((wait(&status)) > 0);    ;
+    }
+  }
+  fclose(fl);
+}
+```
 ## Soal 3
 Jaya adalah seorang programmer handal mahasiswa informatika. Suatu hari dia
 memperoleh tugas yang banyak dan berbeda tetapi harus dikerjakan secara bersamaan

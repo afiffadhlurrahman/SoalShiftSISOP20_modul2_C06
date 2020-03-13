@@ -231,6 +231,178 @@ execl("/bin/bash","bash",argv[4],NULL);
 yang berarti kita menjalankan bash script yang pathnya merupakan `argv[4]`.
 
 ## Soal 2
+```
+Shisoppu mantappu! itulah yang selalu dikatakan Kiwa setiap hari karena sekarang dia
+merasa sudah jago materi sisop. Karena merasa jago, suatu hari Kiwa iseng membuat
+sebuah program.
+a. Pertama-tama, Kiwa membuat sebuah folder khusus, di dalamnya dia membuat
+sebuah program C yang per 30 detik membuat sebuah folder dengan nama
+timestamp [YYYY-mm-dd_HH:ii:ss].
+b. Tiap-tiap folder lalu diisi dengan 20 gambar yang di download dari
+https://picsum.photos/, dimana tiap gambar di download setiap 5 detik. Tiap
+gambar berbentuk persegi dengan ukuran (t%1000)+100 piksel dimana t adalah
+
+detik Epoch Unix. Gambar tersebut diberi nama dengan format timestamp [YYYY-
+mm-dd_HH:ii:ss].
+
+c. Agar rapi, setelah sebuah folder telah terisi oleh 20 gambar, folder akan di zip dan
+folder akan di delete(sehingga hanya menyisakan .zip).
+
+d. Karena takut program tersebut lepas kendali, Kiwa ingin program tersebut men-
+generate sebuah program "killer" yang siap di run(executable) untuk
+
+menterminasi semua operasi program tersebut. Setelah di run, program yang
+menterminasi ini lalu akan mendelete dirinya sendiri.
+e. Kiwa menambahkan bahwa program utama bisa dirun dalam dua mode, yaitu
+MODE_A dan MODE_B. untuk mengaktifkan MODE_A, program harus dijalankan
+dengan argumen -a. Untuk MODE_B, program harus dijalankan dengan argumen
+-b. Ketika dijalankan dalam MODE_A, program utama akan langsung
+menghentikan semua operasinya ketika program killer dijalankan. Untuk
+MODE_B, ketika program killer dijalankan, program utama akan berhenti tapi
+membiarkan proses di setiap folder yang masih berjalan sampai selesai(semua
+folder terisi gambar, terzip lalu di delete).
+
+Kiwa lalu terbangun dan sedih karena menyadari programnya hanya sebuah mimpi.
+Buatlah program dalam mimpi Kiwa jadi nyata!
+Catatan:
+- Tidak boleh memakai system().
+- Program utama harus ter-detach dari terminal
+Hint:
+- Gunakan fitur picsum.photos untuk mendapatkan gambar dengan ukuran
+tertentu
+- Epoch Unix bisa didapatkan dari time()
+```
+
+### Penyelesaian no. 2
+```
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <syslog.h>
+#include <string.h>
+#include <time.h>
+#include <wait.h>
+
+int main() {
+    pid_t pid, sid;        // Variabel untuk menyimpan PID
+
+    pid = fork();     // Menyimpan PID dari Child Process
+
+    /* Keluar saat fork gagal
+    * (nilai variabel pid < 0) */
+    if (pid < 0) {
+    exit(EXIT_FAILURE);
+    }
+
+    /* Keluar saat fork berhasil
+    * (nilai variabel pid adalah PID dari child process) */
+    if (pid > 0) {
+    exit(EXIT_SUCCESS);
+    }
+
+    umask(0);
+
+    sid = setsid();
+    if (sid < 0) {
+    exit(EXIT_FAILURE);
+    }
+
+
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+
+    while (1) {
+        pid_t child_id;
+        int status;  
+
+        char buffer[80];
+    	char b[]="/home/afif/sisop/shift2/";
+        time_t rawtime;
+	    struct tm *info;
+        time( &rawtime );
+        info = localtime( &rawtime );
+        strftime(buffer,80,"%Y-%m-%d_%H:%M:%S", info);
+        strcat(b,buffer);  	      
+
+        child_id = fork();
+        if (child_id < 0) {
+            exit(EXIT_FAILURE);            
+        }
+      
+        if (child_id == 0) {
+            if(fork()==0){
+                char *binaryPath = "/bin/mkdir";
+                char *argv[] = {binaryPath, b, NULL};
+                execv(binaryPath, argv);
+            }
+            else{
+                while ((wait(&status)) > 0);
+                int count=20;
+                while(count>0){
+                    if (fork() == 0)
+                    {
+                        chdir(b);
+                        
+                        struct tm t;
+                        time_t t_of_day;
+                        time_t s, val = 1;
+
+                        struct tm* current_time;
+                        s = time(NULL);
+                        current_time = localtime(&s);
+                        
+                        t.tm_year = current_time->tm_year;  // Year - 1900
+                        t.tm_mon = current_time->tm_mon;           // Month, where 0 = jan
+                        t.tm_mday = current_time->tm_mday;          // Day of the month
+                        t.tm_hour = current_time->tm_hour;
+                        t.tm_min = current_time->tm_min;
+                        t.tm_sec = current_time->tm_sec;
+                        t.tm_isdst = -1;        // Is DST on? 1 = yes, 0 = no, -1 = unknown
+                        t_of_day = mktime(&t);
+                        //zip
+                        t_of_day = (t_of_day%1000)+100;
+                        char destination[1000]="https://picsum.photos/";
+                        char buffer1[1000];
+                        
+                        sprintf(buffer1,"%ld",(long)t_of_day);
+                        strcat(destination,buffer1);
+                        
+                        time_t rawtime;
+                        struct tm *info;
+                        char name[80];
+                        char namefile[80];
+
+                        time( &rawtime );
+                        info = localtime( &rawtime );
+
+                        strftime(name,80,"%Y-%m-%d_%I:%M:%S", info);
+                        strcat(namefile,name);
+
+                        char *binaryPath1 = "/usr/bin/wget";
+                        char *argv[] = {binaryPath1,"-P",b,"-qO",namefile, destination, NULL};
+                        execv(binaryPath1, argv);
+                    }
+                    count--;
+                    sleep(5);   
+                }
+                char *binaryPath2 = "/usr/bin/zip";
+                char *argv  [] = {binaryPath2,"-rm",b,b, NULL};
+                execv(binaryPath2, argv);
+            }
+        }
+        else{
+            sleep(30);
+        }            
+    }
+}
+
+```
 
 ## Soal 3
 Jaya adalah seorang programmer handal mahasiswa informatika. Suatu hari dia
@@ -583,178 +755,3 @@ Dalam parent process ini kita melakukan forking lagi karena kita akan menggunaka
 char *argv7[] = {"touch",filename4, NULL};
 execv("/usr/bin/touch", argv7);
 ```
-## Soal 2
-```
-Shisoppu mantappu! itulah yang selalu dikatakan Kiwa setiap hari karena sekarang dia
-merasa sudah jago materi sisop. Karena merasa jago, suatu hari Kiwa iseng membuat
-sebuah program.
-a. Pertama-tama, Kiwa membuat sebuah folder khusus, di dalamnya dia membuat
-sebuah program C yang per 30 detik membuat sebuah folder dengan nama
-timestamp [YYYY-mm-dd_HH:ii:ss].
-b. Tiap-tiap folder lalu diisi dengan 20 gambar yang di download dari
-https://picsum.photos/, dimana tiap gambar di download setiap 5 detik. Tiap
-gambar berbentuk persegi dengan ukuran (t%1000)+100 piksel dimana t adalah
-
-detik Epoch Unix. Gambar tersebut diberi nama dengan format timestamp [YYYY-
-mm-dd_HH:ii:ss].
-
-c. Agar rapi, setelah sebuah folder telah terisi oleh 20 gambar, folder akan di zip dan
-folder akan di delete(sehingga hanya menyisakan .zip).
-
-d. Karena takut program tersebut lepas kendali, Kiwa ingin program tersebut men-
-generate sebuah program "killer" yang siap di run(executable) untuk
-
-menterminasi semua operasi program tersebut. Setelah di run, program yang
-menterminasi ini lalu akan mendelete dirinya sendiri.
-e. Kiwa menambahkan bahwa program utama bisa dirun dalam dua mode, yaitu
-MODE_A dan MODE_B. untuk mengaktifkan MODE_A, program harus dijalankan
-dengan argumen -a. Untuk MODE_B, program harus dijalankan dengan argumen
--b. Ketika dijalankan dalam MODE_A, program utama akan langsung
-menghentikan semua operasinya ketika program killer dijalankan. Untuk
-MODE_B, ketika program killer dijalankan, program utama akan berhenti tapi
-membiarkan proses di setiap folder yang masih berjalan sampai selesai(semua
-folder terisi gambar, terzip lalu di delete).
-
-Kiwa lalu terbangun dan sedih karena menyadari programnya hanya sebuah mimpi.
-Buatlah program dalam mimpi Kiwa jadi nyata!
-Catatan:
-- Tidak boleh memakai system().
-- Program utama harus ter-detach dari terminal
-Hint:
-- Gunakan fitur picsum.photos untuk mendapatkan gambar dengan ukuran
-tertentu
-- Epoch Unix bisa didapatkan dari time()
-```
-
-### Penyelesaian no. 2
-```
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <unistd.h>
-#include <syslog.h>
-#include <string.h>
-#include <time.h>
-#include <wait.h>
-
-int main() {
-    pid_t pid, sid;        // Variabel untuk menyimpan PID
-
-    pid = fork();     // Menyimpan PID dari Child Process
-
-    /* Keluar saat fork gagal
-    * (nilai variabel pid < 0) */
-    if (pid < 0) {
-    exit(EXIT_FAILURE);
-    }
-
-    /* Keluar saat fork berhasil
-    * (nilai variabel pid adalah PID dari child process) */
-    if (pid > 0) {
-    exit(EXIT_SUCCESS);
-    }
-
-    umask(0);
-
-    sid = setsid();
-    if (sid < 0) {
-    exit(EXIT_FAILURE);
-    }
-
-
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
-
-    while (1) {
-        pid_t child_id;
-        int status;  
-
-        char buffer[80];
-    	char b[]="/home/afif/sisop/shift2/";
-        time_t rawtime;
-	    struct tm *info;
-        time( &rawtime );
-        info = localtime( &rawtime );
-        strftime(buffer,80,"%Y-%m-%d_%H:%M:%S", info);
-        strcat(b,buffer);  	      
-
-        child_id = fork();
-        if (child_id < 0) {
-            exit(EXIT_FAILURE);            
-        }
-      
-        if (child_id == 0) {
-            if(fork()==0){
-                char *binaryPath = "/bin/mkdir";
-                char *argv[] = {binaryPath, b, NULL};
-                execv(binaryPath, argv);
-            }
-            else{
-                while ((wait(&status)) > 0);
-                int count=20;
-                while(count>0){
-                    if (fork() == 0)
-                    {
-                        chdir(b);
-                        
-                        struct tm t;
-                        time_t t_of_day;
-                        time_t s, val = 1;
-
-                        struct tm* current_time;
-                        s = time(NULL);
-                        current_time = localtime(&s);
-                        
-                        t.tm_year = current_time->tm_year;  // Year - 1900
-                        t.tm_mon = current_time->tm_mon;           // Month, where 0 = jan
-                        t.tm_mday = current_time->tm_mday;          // Day of the month
-                        t.tm_hour = current_time->tm_hour;
-                        t.tm_min = current_time->tm_min;
-                        t.tm_sec = current_time->tm_sec;
-                        t.tm_isdst = -1;        // Is DST on? 1 = yes, 0 = no, -1 = unknown
-                        t_of_day = mktime(&t);
-                        //zip
-                        t_of_day = (t_of_day%1000)+100;
-                        char destination[1000]="https://picsum.photos/";
-                        char buffer1[1000];
-                        
-                        sprintf(buffer1,"%ld",(long)t_of_day);
-                        strcat(destination,buffer1);
-                        
-                        time_t rawtime;
-                        struct tm *info;
-                        char name[80];
-                        char namefile[80];
-
-                        time( &rawtime );
-                        info = localtime( &rawtime );
-
-                        strftime(name,80,"%Y-%m-%d_%I:%M:%S", info);
-                        strcat(namefile,name);
-
-                        char *binaryPath1 = "/usr/bin/wget";
-                        char *argv[] = {binaryPath1,"-P",b,"-qO",namefile, destination, NULL};
-                        execv(binaryPath1, argv);
-                    }
-                    count--;
-                    sleep(5);   
-                }
-                char *binaryPath2 = "/usr/bin/zip";
-                char *argv  [] = {binaryPath2,"-rm",b,b, NULL};
-                execv(binaryPath2, argv);
-            }
-        }
-        else{
-            sleep(30);
-        }            
-    }
-}
-
-```
-## Soal 3
-### Penyelesaian No. 3

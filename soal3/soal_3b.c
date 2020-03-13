@@ -28,7 +28,9 @@ int main() {
         char *argv[] = {"mkdir", "/home/afif/modul2/indomie", NULL};
         execv("/bin/mkdir", argv);
     } else {
-        char *argv[] = {"mkdir", "/home/afif/modul2/sedap", NULL};
+        while ((wait(&status)) > 0);
+        sleep(5);
+        char *argv[] = {"mkdir", "/home/afif/modul2/sedaap", NULL};
         execv("/bin/mkdir", argv);
         }
   } 

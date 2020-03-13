@@ -222,3 +222,353 @@ yang berarti kita menjalankan bash script yang pathnya merupakan `argv[4]`.
 ## Soal 2
 
 ## Soal 3
+Jaya adalah seorang programmer handal mahasiswa informatika. Suatu hari dia
+memperoleh tugas yang banyak dan berbeda tetapi harus dikerjakan secara bersamaan
+(multiprocessing).
+
+a. Program buatan jaya harus bisa membuat dua direktori di
+“/home/[USER]/modul2/”. Direktori yang pertama diberi nama “indomie”, lalu
+lima detik kemudian membuat direktori yang kedua bernama “sedaap”.
+
+b. Kemudian program tersebut harus meng-ekstrak file jpg.zip di direktori
+“/home/[USER]/modul2/”. Setelah tugas sebelumnya selesai, ternyata tidak
+hanya itu tugasnya.
+
+c. Diberilah tugas baru yaitu setelah di ekstrak, hasil dari ekstrakan tersebut (di
+dalam direktori “home/[USER]/modul2/jpg/”) harus dipindahkan sesuai dengan
+pengelompokan, semua file harus dipindahkan ke
+“/home/[USER]/modul2/sedaap/” dan semua direktori harus dipindahkan ke
+“/home/[USER]/modul2/indomie/”.
+
+d. Untuk setiap direktori yang dipindahkan ke “/home/[USER]/modul2/indomie/”
+harus membuat dua file kosong. File yang pertama diberi nama “coba1.txt”, lalu
+3 detik kemudian membuat file bernama “coba2.txt”.
+(contoh : “/home/[USER]/modul2/indomie/{nama_folder}/coba1.txt”).
+Karena Jaya terlalu banyak tugas dia jadi stress, jadi bantulah Jaya agar bisa membuat
+program tersebut.
+Catatan :
+- Tidak boleh memakai system().
+- Tidak boleh memakai function C mkdir() ataupun rename().
+- Gunakan exec dan fork
+- Direktori “.” dan “..” tidak termasuk
+### Penyelesaian no.3
+```
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <wait.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <string.h>
+
+int main() {
+
+  pid_t child_id;
+  int status;
+  child_id = fork();
+          
+  if (child_id < 0) {
+      exit(EXIT_FAILURE); // Jika gagal membuat proses baru, program akan berhenti
+  }
+
+  if (child_id == 0) {
+      // this is child    
+    pid_t child_id;
+    int status2;
+    child_id = fork();
+    
+    if (child_id < 0) {
+        exit(EXIT_FAILURE); // Jika gagal membuat proses baru, program akan berhenti
+    }
+
+    if (child_id == 0) {
+        pid_t child_id;
+        int status3;
+        child_id = fork();
+        
+        if (child_id < 0) {
+          exit(EXIT_FAILURE); /* Jika gagal membuat proses baru, 
+program akan berhenti*/
+        }
+
+        if (child_id == 0) {
+          pid_t child_id;
+          child_id = fork();
+          int status9;
+          if (child_id < 0) {
+              exit(EXIT_FAILURE); /* Jika gagal membuat proses baru, 
+program akan berhenti*/
+          }
+
+          if (child_id == 0) {
+              // this is child    
+              char *argv[] = {"mkdir", "/home/vincent/modul2/indomie", NULL};
+              execv("/bin/mkdir", argv);
+          } else {
+              while ((wait(&status9)) > 0);
+              sleep(5);
+              char *argv[] = {"mkdir", "/home/vincent/modul2/sedaap", NULL};
+              execv("/bin/mkdir", argv);
+              }
+        } 
+        else {
+          // this is parent
+          while ((wait(&status3)) > 0);
+          char *argv[3] = {"unzip","/home/vincent/modul2/jpg.zip", NULL};
+          execv("/usr/bin/unzip", argv);
+        }
+    } 
+    else {
+      //this is parent
+        while ((wait(&status2)) > 0);
+        char filename[100] ={"/home/vincent/modul2/jpg/"},filename2[100];
+        struct dirent *dp;
+        DIR *fd = opendir("/home/vincent/modul2/jpg/");
+        if(fd==NULL) return 1;
+        //ubah folder
+        
+        while((dp = readdir(fd))!=NULL){
+          
+          if (!strcmp (dp->d_name, ".")) continue;
+          if (!strcmp (dp->d_name, ".."))continue;
+          strcpy(filename2,filename);
+          strcat(filename2,dp->d_name);
+
+          pid_t child_id5;
+          child_id5 = fork();
+
+          if (child_id5 < 0) {
+            exit(EXIT_FAILURE); /* Jika gagal membuat proses baru, 
+program akan berhenti*/
+          }  
+          if(child_id5 == 0 && dp->d_type == 4){
+              char *arg4v[] = {"mv",filename2,"/home/vincent/modul2/indomie/",NULL};
+              execv("/bin/mv",arg4v);
+          }
+          if(child_id5 == 0 && dp->d_type == 8){
+               char *arg5v[] = {"mv",filename2,"/home/vincent/modul2/sedaap/",NULL};
+              execv("/bin/mv",arg5v);
+          }
+        }
+    }
+  } else {
+        while ((wait(&status)) > 0);
+        sleep(1);
+        char filename3[100] ={"/home/vincent/modul2/indomie/"},filename4[100];
+        struct dirent *dp;
+        DIR *fd = opendir("/home/vincent/modul2/indomie/");
+        if(fd==NULL) return 1;
+        while((dp = readdir(fd)) !=NULL){
+            if (!strcmp (dp->d_name, ".")) continue;
+            if (!strcmp (dp->d_name, ".."))continue;
+            
+            pid_t child_id3;
+            int status10;
+            child_id3 = fork();
+            if (child_id3 < 0) {
+                exit(EXIT_FAILURE); /* Jika gagal membuat proses baru, 
+program akan berhenti*/
+            }
+            if(child_id3==0){
+                strcpy(filename4,filename3);
+                strcat(filename4,dp->d_name);
+                strcat(filename4,"/coba1.txt");
+                char *argv6[] = {"touch",filename4, NULL};
+                execv("/usr/bin/touch", argv6);  
+            }
+            else{
+                while ((wait(&status10)) > 0);
+                pid_t child_id4;;
+                child_id4=fork();
+                if (child_id4 < 0) {
+                    exit(EXIT_FAILURE); /* Jika gagal membuat proses baru, 
+program akan berhenti*/
+                }
+                if(child_id4==0){
+                    sleep(3);
+                    strcpy(filename4,filename3);
+                    strcat(filename4,dp->d_name);
+                    strcat(filename4,"/coba2.txt");
+                    char *argv7[] = {"touch",filename4, NULL};
+                    execv("/usr/bin/touch", argv7);
+                }
+            }
+        }
+    }  
+} 
+```
+Program ini merupakan program yang membutuhkan forking yang cukup banyak karena merupakan program yang dikerjakan secara bersamaan (multiprocessing).
+
+#### PEMBUATAN 2 DIREKTORI
+Pada process awal, kita menggunakan `fork()` untuk membuat 2 direkotri yaitu indomie dan sedaap.
+```
+pid_t child_id;
+child_id = fork();
+```
+Pada tahap ini kita membagi process menjadi parent dan child. Jika `child_id==0` maka itu merupakan childnya. Jika `child_id < 0` maka program akan berhenti karena gagal dalam membuat process
+```
+if (child_id < 0) {
+    exit(EXIT_FAILURE);
+}
+```
+Kemudian pada child process , kita membuat directory indomie dengan menggunakan `exec`, kemudian dalam parent process kita melakukan wait dengan cara `while ((wait(&status9)) > 0);` dan lakukan `sleep` selama 5 detik dan lakukan `exec` untuk membuat directory seedap. `sleep` dilakukan agar directory seedap terbuat 5 detik setelah directory indomie dibuat 
+```
+if (child_id == 0) {
+         // this is child    
+          char *argv[] = {"mkdir", "/home/vincent/modul2/indomie", NULL};
+          execv("/bin/mkdir", argv);
+} else {
+          while ((wait(&status9)) > 0);
+          sleep(5);
+          char *argv[] = {"mkdir", "/home/vincent/modul2/sedaap", NULL};
+          execv("/bin/mkdir", argv);
+}
+        
+```
+#### EKSTRAK JPG.ZIP
+Process ekstrak ini berhubungan dengan pembuatan directory indomie dan seedap tadi.
+Setelah 2 directory(indomie dan seedap) tersebut dibuat, program ini harus bisa meng-ekstrak jpg.zip. Hal ini dapat dilakukan dengan melakukan forking lagi yang process `fork()`nya kurang lebih sama dengan yang sebelumnya. yaitu membagi menjadi child process dan parent process. 
+
+dimana child processnya merupakan pembuatan directory tadi (indomie dan seedap), dan parent processnya adalah sebagai berikut,
+```
+while ((wait(&status3)) > 0);
+char *argv[3] = {"unzip","/home/vincent/modul2/jpg.zip", NULL};
+execv("/usr/bin/unzip", argv);
+```
+fungsi `while ((wait(&status3)) > 0);` untuk menunggu process child jalan,lalu kita menggunakan `execv`untuk melakukan unzip/ekstrak jpg.zip
+
+#### MEMINDAHKAN HASIL EKSTRAK
+Process ini juga berhubungan dengan 2 process sebelumnya, dimana setelah membuat directory dan mengekstrak jpg.zip, kita memindahkan hasil ekstrak tersebut kedalam directory indomie dan sedap. Jika yang dipindahkan berupa directory, maka kita pindahkan ke directory indomie dan jika yang dipindahkan berupa file, kita pindahkan ke directory seedap.
+
+Pada tahap ini, kita menggunakan forking yang sama juga seperti process sebelumnya yaotu membuat child process dan parent process dimana child processnya adalah process ekstrak sebelumnya dan parent processnya adalah
+```
+while ((wait(&status2)) > 0);
+        char filename[100] ={"/home/vincent/modul2/jpg/"},filename2[100];
+        struct dirent *dp;
+        DIR *fd = opendir("/home/vincent/modul2/jpg/");
+        if(fd==NULL) return 1;
+        //ubah folder
+        
+        while((dp = readdir(fd))!=NULL){
+          
+          if (!strcmp (dp->d_name, ".")) continue;
+          if (!strcmp (dp->d_name, ".."))continue;
+          strcpy(filename2,filename);
+          strcat(filename2,dp->d_name);
+
+          pid_t child_id5;
+          child_id5 = fork();
+
+          if (child_id5 < 0) {
+            exit(EXIT_FAILURE);
+          }  
+          if(child_id5 == 0 && dp->d_type == 4){
+              char *arg4v[] = {"mv",filename2,"/home/vincent/modul2/indomie/",NULL};
+              execv("/bin/mv",arg4v);
+          }
+          if(child_id5 == 0 && dp->d_type == 8){
+               char *arg5v[] = {"mv",filename2,"/home/vincent/modul2/sedaap/",NULL};
+              execv("/bin/mv",arg5v);
+          }
+        }
+```
+disini kita menggunakan dirent dalam library `dirent.h` untuk mengambil file yang terdapat di diretory tertentu. dalam hal ini kita memasukan directory `/home/vincent/modul2/jpg/` untuk mengambil file/ directory dalam directory jpg
+```
+struct dirent *dp;
+DIR *fd = opendir("/home/vincent/modul2/jpg/");
+```
+kemudian kita melakukan looping dalam directory jpg tersebut dengan `while((dp = readdir(fd))!=NULL)` dan didalamnya untuk setiap file yang ada kita check dan pindahkan ke directory seedap dan untuk setiap directory yang ada kita pindahkan ke directory indomie. untuk directory `.` dan `..` tidak termasuk maka kita lakukan continue
+```
+if (!strcmp (dp->d_name, ".")) continue;
+if (!strcmp (dp->d_name, ".."))continue;
+```
+kemudian kita lakukan strcpy pada nama file yang ingin dipindahkan yaitu `"/home/vincent/modul2/jpg/"` dan lakukan strcat pada file yang ditemukan sehingga terbentuk path baru yang merupakan path file dalam directory jpg. 
+```
+strcpy(filename2,filename);
+strcat(filename2,dp->d_name);
+```
+Kemudian kita lakukan `fork()` lagi karena kita mau menggunakan exec. setelah melakukan fork, akan terbagi menjadi child dan parent. pada child process kita bagi untuk directory dan untuk file. Jika yang ingin dipindahkan berupa directory, maka kita pindahkan ke indomie dengan menggunakan exec
+```
+if(child_id5 == 0 && dp->d_type == 4){
+      char *arg4v[] = {"mv",filename2,"/home/vincent/modul2/indomie/",NULL};
+      execv("/bin/mv",arg4v);
+}
+```
+dan jika yang ingin dipindahkan berupa file, kita pindahkan ke seedap dengan
+```
+if(child_id5 == 0 && dp->d_type == 8){
+      char *arg5v[] = {"mv",filename2,"/home/vincent/modul2/sedaap/",NULL};
+      execv("/bin/mv",arg5v);
+}
+```
+#### MEMBUAT 2 FILE KOSONG
+Terakhir, setelah membuat directory, ekstrak dan memindahkan hasil ekstrak, kita haru membuat 2 file kosong `coba1.txt` dan `coba2.txt` dalam directory yang terdapat di directory indomie. dimana pembuatan file tersebut harus memiliki selang 3 detik.
+
+Untuk melakukan ini, kita harus melakukan process yang sama seperti sebelumnya yaitu forking dengan child processnya adalah memindahkan hasil ekstrak dan parent processnya adalah 
+```
+ while ((wait(&status)) > 0);
+        sleep(1);
+        char filename3[100] ={"/home/vincent/modul2/indomie/"},filename4[100];
+        struct dirent *dp;
+        DIR *fd = opendir("/home/vincent/modul2/indomie/");
+        if(fd==NULL) return 1;
+        while((dp = readdir(fd)) !=NULL){
+            if (!strcmp (dp->d_name, ".")) continue;
+            if (!strcmp (dp->d_name, ".."))continue;
+            
+            pid_t child_id3;
+            int status10;
+            child_id3 = fork();
+            if (child_id3 < 0) {
+                exit(EXIT_FAILURE);
+            }
+            if(child_id3==0){
+                strcpy(filename4,filename3);
+                strcat(filename4,dp->d_name);
+                strcat(filename4,"/coba1.txt");
+                char *argv6[] = {"touch",filename4, NULL};
+                execv("/usr/bin/touch", argv6);  
+            }
+            else{
+                while ((wait(&status10)) > 0);
+                pid_t child_id4;;
+                child_id4=fork();
+                if (child_id4 < 0) {
+                    exit(EXIT_FAILURE);
+                }
+                if(child_id4==0){
+                    sleep(3);
+                    strcpy(filename4,filename3);
+                    strcat(filename4,dp->d_name);
+                    strcat(filename4,"/coba2.txt");
+                    char *argv7[] = {"touch",filename4, NULL};
+                    execv("/usr/bin/touch", argv7);
+                }
+            }
+        }
+```
+pada awalnya kita melakukan wait seperti biasa, lalu kita juga menggunakan dirent untuk bisa mendapatkan file/directory dalam suatu directory, dan sama seperti sebelumnya, kita lakukan looping dalam directory tertentu untuk mendapatkan file/directory dalam directory tersebut. Dalam kasus ini, kita melakukan looping dalam directory indomie
+```
+DIR *fd = opendir("/home/vincent/modul2/indomie/");
+```
+dan sama seperti sebelumnya kita tidak perlu directory `.` dan `..` maka kita continue.
+
+Lalu disini, kita melakukan forking lagi karena disini kita berusaha membuat file `coba1.txt` dan 3 detik kemudian membuat file `coba2.txt` dengan menggunakan exec, maka pada child kita melakukan strcpy file dari file `"/home/vincent/modul2/indomie/"` lalu menggunakan strcat menggabungkan directory yang dituju, dan strcat lagi untuk menggabungkan file `/coba1.txt`. setelah dilakukan penggabungan, nnti akan menjadi
+```
+"/home/vincent/modul2/indomie/[namaDirectory]/coba1.txt"
+```
+Setelah ini, kita menggunakan execv untuk membuat file
+```
+char *argv6[] = {"touch",filename4, NULL};
+execv("/usr/bin/touch", argv6); 
+```
+Kemudian pada parent process, kita gunakan wait dan `sleep(3)` untuk memberi jeda waktu sebanyak 3 detik setelah coba1.txt dibuat.
+
+Dalam parent process ini kita melakukan forking lagi karena kita akan menggunakan exec lagi. process yang dilakukan kurang lebih sama dengan yang sebelumnya. hanya saja, kita membuat file `coba2.txt`. kita juga menggunakan execv untuk membuat file tersebut
+```
+char *argv7[] = {"touch",filename4, NULL};
+execv("/usr/bin/touch", argv7);
+```

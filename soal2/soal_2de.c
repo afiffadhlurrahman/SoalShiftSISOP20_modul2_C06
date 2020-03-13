@@ -27,7 +27,7 @@ void killer(char mode[]){
         execv("/bin/chmod", argv);
     }
     else{
-      while ((wait(&status)) > 0);    ;
+      while ((wait(&status)) > 0);    
     }
   }
   fclose(fl);

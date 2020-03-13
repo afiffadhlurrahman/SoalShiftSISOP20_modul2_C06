@@ -21,7 +21,8 @@ int main() {
   else {
     // this is parent
     while ((wait(&status)) > 0);
-    char *argv[] = {"mkdir", "/home/afif/modul2/sedap", NULL};
+    sleep(5);
+    char *argv[] = {"mkdir", "/home/afif/modul2/sedaap", NULL};
     execv("/bin/mkdir", argv);
   }
 }

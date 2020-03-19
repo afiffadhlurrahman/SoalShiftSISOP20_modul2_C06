@@ -14,26 +14,22 @@
 void killer(char mode[]){
     FILE *fl;
     fl = fopen("killer.sh", "w");
+    fprintf(fl,"rm $0\n");
     if(strcmp(mode, "-a")==0) fprintf(fl, "#!/bin/bash\nkill -9 -%d", getpid());
-    if(strcmp(mode, "-b")==0) fprintf(fl, "#!/bin/bash\nkill %d", getpid());
+    else if(strcmp(mode, "-b")==0) fprintf(fl, "#!/bin/bash\nkill %d", getpid());
     int status;
     pid_t child_id;
     child_id = fork();
-    if(child_id==0){  
-        pid_t child_id2;
-        child_id2 = fork();
-        if (child_id2 == 0){
+    if(child_id==0){ 
         char *argv[] = {"chmod", "u+x", "killer.sh", NULL};
         execv("/bin/chmod", argv);
     }
-    else{
-      while ((wait(&status)) > 0);    
-    }
-  }
+  
   fclose(fl);
 }
 
 int main(int argc, char **argv) {
+    
     pid_t pid, sid;        // Variabel untuk menyimpan PID
 
     pid = fork();     // Menyimpan PID dari Child Process

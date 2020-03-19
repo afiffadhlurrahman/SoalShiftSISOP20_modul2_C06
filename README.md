@@ -233,6 +233,8 @@ execl("/bin/bash","bash",argv[4],NULL);
 ```
 yang berarti kita menjalankan bash script yang pathnya merupakan `argv[4]`.
 
+![Input dan Hasil](https://github.com/afiffadhlurrahman/SoalShiftSISOP20_modul2_C06/tree/master/images/Capture8.png)
+
 ## Soal 2
 Shisoppu mantappu! itulah yang selalu dikatakan Kiwa setiap hari karena sekarang dia
 merasa sudah jago materi sisop. Karena merasa jago, suatu hari Kiwa iseng membuat
@@ -774,3 +776,7 @@ Dalam parent process ini kita melakukan forking lagi karena kita akan menggunaka
 char *argv7[] = {"touch",filename4, NULL};
 execv("/usr/bin/touch", argv7);
 ```
+![hasil directory di Indomie](https://github.com/afiffadhlurrahman/SoalShiftSISOP20_modul2_C06/tree/master/images/jumlahDir.png)
+![hasil file di Sedaap](https://github.com/afiffadhlurrahman/SoalShiftSISOP20_modul2_C06/tree/master/images/jumlahFile.png)
+![beda waktu indomie sedaap](https://github.com/afiffadhlurrahman/SoalShiftSISOP20_modul2_C06/tree/master/images/bedaWaktuIndomieSedaap.png)
+![beda waktu cobae](https://github.com/afiffadhlurrahman/SoalShiftSISOP20_modul2_C06/tree/master/images/bedaWaktuCoba.png)

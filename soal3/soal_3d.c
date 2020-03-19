@@ -119,18 +119,19 @@ int main() {
                 strcpy(filename4,filename3);
                 strcat(filename4,dp->d_name);
                 strcat(filename4,"/coba1.txt");
+
                 char *argv6[] = {"touch",filename4, NULL};
                 execv("/usr/bin/touch", argv6);  
             }
             else{
                 while ((wait(&status10)) > 0);
+                sleep(3);
                 pid_t child_id4;;
                 child_id4=fork();
                 if (child_id4 < 0) {
                     exit(EXIT_FAILURE); // Jika gagal membuat proses baru, program akan berhenti
                 }
                 if(child_id4==0){
-                    sleep(3);
                     strcpy(filename4,filename3);
                     strcat(filename4,dp->d_name);
                     strcat(filename4,"/coba2.txt");

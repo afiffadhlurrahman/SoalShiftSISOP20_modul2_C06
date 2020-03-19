@@ -101,6 +101,9 @@ int main(int argc, char** argv){
    //daemon process end!--------------------------------------------
     
     while(1){
+    	time_t currTime = time(NULL);
+
+        struct tm tm = *localtime(&currTime);
         if((tm.tm_hour == hour || hourBintang) && (tm.tm_min == min || minBintang)
           && (tm.tm_sec == sec || secBintang)){
             pid_t child_id1;
@@ -406,22 +409,17 @@ untuk killernya
 void killer(char mode[]){
     FILE *fl;
     fl = fopen("killer.sh", "w");
+    fprintf(fl,"rm $0\n");
     if(strcmp(mode, "-a")==0) fprintf(fl, "#!/bin/bash\nkill -9 -%d", getpid());
-    if(strcmp(mode, "-b")==0) fprintf(fl, "#!/bin/bash\nkill %d", getpid());
+    else if(strcmp(mode, "-b")==0) fprintf(fl, "#!/bin/bash\nkill %d", getpid());
     int status;
     pid_t child_id;
     child_id = fork();
-    if(child_id==0){  
-        pid_t child_id2;
-        child_id2 = fork();
-        if (child_id2 == 0){
+    if(child_id==0){ 
         char *argv[] = {"chmod", "u+x", "killer.sh", NULL};
         execv("/bin/chmod", argv);
     }
-    else{
-      while ((wait(&status)) > 0);    
-    }
-  }
+  
   fclose(fl);
 }
 ```
@@ -585,6 +583,7 @@ program akan berhenti*/
             }
             else{
                 while ((wait(&status10)) > 0);
+		sleep(3);
                 pid_t child_id4;;
                 child_id4=fork();
                 if (child_id4 < 0) {
@@ -592,7 +591,6 @@ program akan berhenti*/
 program akan berhenti*/
                 }
                 if(child_id4==0){
-                    sleep(3);
                     strcpy(filename4,filename3);
                     strcat(filename4,dp->d_name);
                     strcat(filename4,"/coba2.txt");
@@ -738,13 +736,13 @@ Untuk melakukan ini, kita harus melakukan process yang sama seperti sebelumnya y
             }
             else{
                 while ((wait(&status10)) > 0);
+		sleep(3);
                 pid_t child_id4;;
                 child_id4=fork();
                 if (child_id4 < 0) {
                     exit(EXIT_FAILURE);
                 }
                 if(child_id4==0){
-                    sleep(3);
                     strcpy(filename4,filename3);
                     strcat(filename4,dp->d_name);
                     strcat(filename4,"/coba2.txt");

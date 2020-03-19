@@ -679,9 +679,9 @@ while ((wait(&status2)) > 0);
           }
         }
 ```
-![hasil directory di Indomie](/images/jumlahDir.png)
+![hasil directory di Indomie](/images/jumlahDir.PNG)
 
-![hasil file di Sedaap](/images/jumlahFile.png)
+![hasil file di Sedaap](/images/jumlahFile.PNG)
 
 disini kita menggunakan dirent dalam library `dirent.h` untuk mengambil file yang terdapat di diretory tertentu. dalam hal ini kita memasukan directory `/home/vincent/modul2/jpg/` untuk mengambil file/ directory dalam directory jpg
 ```
@@ -781,6 +781,6 @@ char *argv7[] = {"touch",filename4, NULL};
 execv("/usr/bin/touch", argv7);
 ```
 
-![beda waktu indomie sedaap](/images/bedaWaktuIndomieSedaap.png)
+![beda waktu indomie sedaap](/images/bedaWaktuIndomeSedaap.png)
 
-![beda waktu coba](/images/bedaWaktuCoba.png)
+![beda waktu coba](/images/bedaWaktuCoba.jpg)

@@ -679,6 +679,10 @@ while ((wait(&status2)) > 0);
           }
         }
 ```
+![hasil directory di Indomie](/images/jumlahDir.png)
+
+![hasil file di Sedaap](/images/jumlahFile.png)
+
 disini kita menggunakan dirent dalam library `dirent.h` untuk mengambil file yang terdapat di diretory tertentu. dalam hal ini kita memasukan directory `/home/vincent/modul2/jpg/` untuk mengambil file/ directory dalam directory jpg
 ```
 struct dirent *dp;
@@ -776,7 +780,7 @@ Dalam parent process ini kita melakukan forking lagi karena kita akan menggunaka
 char *argv7[] = {"touch",filename4, NULL};
 execv("/usr/bin/touch", argv7);
 ```
-![hasil directory di Indomie](https://github.com/afiffadhlurrahman/SoalShiftSISOP20_modul2_C06/tree/master/images/jumlahDir.png)
-![hasil file di Sedaap](https://github.com/afiffadhlurrahman/SoalShiftSISOP20_modul2_C06/tree/master/images/jumlahFile.png)
-![beda waktu indomie sedaap](https://github.com/afiffadhlurrahman/SoalShiftSISOP20_modul2_C06/tree/master/images/bedaWaktuIndomieSedaap.png)
-![beda waktu cobae](https://github.com/afiffadhlurrahman/SoalShiftSISOP20_modul2_C06/tree/master/images/bedaWaktuCoba.png)
+
+![beda waktu indomie sedaap](/images/bedaWaktuIndomieSedaap.png)
+
+![beda waktu cobae](/images/bedaWaktuCoba.png)

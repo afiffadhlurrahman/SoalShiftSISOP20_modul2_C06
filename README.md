@@ -233,7 +233,7 @@ execl("/bin/bash","bash",argv[4],NULL);
 ```
 yang berarti kita menjalankan bash script yang pathnya merupakan `argv[4]`.
 
-![Input dan Hasil](https://github.com/afiffadhlurrahman/SoalShiftSISOP20_modul2_C06/tree/master/images/Capture8.png)
+![Input dan Hasil](/images/Capture8.png)
 
 ## Soal 2
 Shisoppu mantappu! itulah yang selalu dikatakan Kiwa setiap hari karena sekarang dia

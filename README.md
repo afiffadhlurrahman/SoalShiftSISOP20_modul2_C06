@@ -565,11 +565,15 @@ Untuk melakukan command zip pada folder yang sudah selesai (terisi dengan 20 gam
 Untuk timer blocking agar membuat folder baru setiap 30 detik. 
 
 ### Testing soal 2
+#### Soal 2A
 ![soal2](/images/soal2.png)
 ![soal2](/images/soal2a.png)
+#### Soal 2B
 ![soal2](/images/soal2b.png)
 ![soal2](/images/soal2b_v2.png)
+#### Soal 2C
 ![soal2](/images/soal2c.png)
+#### Soal 2D
 ![soal2](/images/soal2d.png)
 
 ## Soal 3

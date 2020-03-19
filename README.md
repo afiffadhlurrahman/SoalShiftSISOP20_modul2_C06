@@ -563,6 +563,15 @@ Untuk melakukan command zip pada folder yang sudah selesai (terisi dengan 20 gam
 }
 ```
 Untuk timer blocking agar membuat folder baru setiap 30 detik. 
+
+### Testing soal 2
+![soal2](/images/soal2.png)
+![soal2](/images/soal2a.png)
+![soal2](/images/soal2b.png)
+![soal2](/images/soal2b_v2.png)
+![soal2](/images/soal2c.png)
+![soal2](/images/soal2d.png)
+
 ## Soal 3
 Jaya adalah seorang programmer handal mahasiswa informatika. Suatu hari dia
 memperoleh tugas yang banyak dan berbeda tetapi harus dikerjakan secara bersamaan

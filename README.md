@@ -425,6 +425,144 @@ void killer(char mode[]){
   fclose(fl);
 }
 ```
+
+### Pembahasan No 2
+```
+int main(int argc, char **argv) {
+pid_t pid, sid; // Variabel untuk menyimpan PID
+pid = fork(); // Menyimpan PID dari Child Process
+/* Keluar saat fork gagal
+* (nilai variabel pid < 0) */
+if (pid < 0) {
+exit(EXIT_FAILURE);
+}
+/* Keluar saat fork berhasil
+* (nilai variabel pid adalah PID dari child process) */
+if (pid > 0) {
+exit(EXIT_SUCCESS);
+}
+
+umask(0);
+sid = setsid();
+if (sid < 0) {
+exit(EXIT_FAILURE);
+}
+close(STDIN_FILENO);
+close(STDOUT_FILENO);
+close(STDERR_FILENO);
+```
+sub program diatas adalah template untuk implementasi daemon
+`killer(argv[1]);` untuk memanggil fungsi killer
+```
+while (1) {
+pid_t child_id;
+int status;
+char buffer[80];
+char b[]="/home/vincent/praktikum2/";
+```
+untuk menyimpan directory tujuan untuk hasil dari mkdir
+```
+time_t rawtime;
+struct tm *info;
+time( &rawtime );
+info = localtime( &rawtime );
+strftime(buffer,80,"%Y-%m-%d_%H:%M:%S", info);
+strcat(b,buffer);
+
+child_id = fork();
+if (child_id < 0) {
+exit(EXIT_FAILURE);
+}
+```
+Untuk mengetahui time, yang nantinya akan digunakan sebagai nama directory.
+```
+if (child_id == 0) {
+	if(fork()==0){
+		char *binaryPath = "/bin/mkdir";
+		char *argv[] = {binaryPath, b, NULL};
+		execv(binaryPath, argv);
+	}
+```
+Untuk membuat directory dengan execv (dilakukan fork ketika membuat directory tersebut agar child bisa berproses untuk tugas berikutnya.
+```
+	else{
+		while ((wait(&status)) > 0);
+		int count=20;
+		while(count>0){
+```
+untuk memastikan bahwa file yang terdownload berjumlah 20
+```
+		if (fork() == 0)
+		{
+			chdir(b);
+```
+Untuk membuka directory yang sudah disimpan dalam array b (dilakukan fork agar child masih dapat melakukan proses berikutnya.
+```
+			struct tm t;
+			time_t t_of_day;
+			time_t s, val = 1;
+			struct tm* current_time;
+			s = time(NULL);
+			current_time = localtime(&s);
+			t.tm_year = current_time->tm_year; // Year - 1900
+			t.tm_mon = current_time->tm_mon; // Month, where 0 = jan
+			t.tm_mday = current_time->tm_mday; // Day of the month
+			t.tm_hour = current_time->tm_hour;
+			t.tm_min = current_time->tm_min;
+			t.tm_sec = current_time->tm_sec;
+			t.tm_isdst = -1; // Is DST on? 1 = yes, 0 = no, -1 = unknown
+			t_of_day = mktime(&t);
+			//zip
+			t_of_day = (t_of_day%1000)+100;
+```
+Untuk mendapatkan epoch time dan diproses sesuai pada soal.
+```
+			char destination[1000]="https://picsum.photos/";
+			char buffer1[1000];
+```
+Untuk mengetahui link mana yang akan di download
+```
+			sprintf(buffer1,"%ld",(long)t_of_day);
+			strcat(destination,buffer1);
+```
+Untuk mengetahui ukuran dari pixel gambar (file) dan dilengkapi dengan link yang akan kita akses untuk mendownload.
+```
+			time_t rawtime;
+			struct tm *info;
+			char name[80];
+			char namefile[80];
+			time( &rawtime );
+			info = localtime( &rawtime );
+			strftime(name,80,"%Y-%m-%d_%I:%M:%S", info);
+			strcat(namefile,name);
+			char *binaryPath1 = "/usr/bin/wget";
+			char *argv[] = {binaryPath1,"-P",b,"-qO",namefile, destination, NULL};
+			execv(binaryPath1, argv);
+			}
+```
+Eksekusi download file dengan menggunakan execv dengan command wget dan melakukan penamaan sesuai real time saat gambar (file) itu terdownload.
+```
+			count--;
+			sleep(5);
+		}
+```
+Melakukan eksekusi download setiap 5 detik, dan count di kurangi agar bisa tepat 20 file dalam 1 folder
+```
+		char *binaryPath2 = "/usr/bin/zip";
+		char *argv [] = {binaryPath2,"-rm",b,b, NULL};
+		execv(binaryPath2, argv);
+	}
+}
+```
+Untuk melakukan command zip pada folder yang sudah selesai (terisi dengan 20 gambar (file) terdownload).
+```
+		else{
+			sleep(30);
+		}
+	}
+}
+```
+Untuk timer blocking agar membuat folder baru setiap 30 detik. 
 ## Soal 3
 Jaya adalah seorang programmer handal mahasiswa informatika. Suatu hari dia
 memperoleh tugas yang banyak dan berbeda tetapi harus dikerjakan secara bersamaan

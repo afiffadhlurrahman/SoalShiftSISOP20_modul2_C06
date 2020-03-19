@@ -75,7 +75,11 @@ int main(int argc, char** argv){
     close(STDERR_FILENO);
    //daemon process end!--------------------------------------------
     
+    //dalem while
     while(1){
+        time_t currTime = time(NULL);
+
+        struct tm tm = *localtime(&currTime);
         if((tm.tm_hour == hour || hourBintang) && (tm.tm_min == min || minBintang)&& (tm.tm_sec == sec || secBintang)){
             pid_t child_id1;
             child_id1 = fork();

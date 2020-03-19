@@ -783,4 +783,4 @@ execv("/usr/bin/touch", argv7);
 
 ![beda waktu indomie sedaap](/images/bedaWaktuIndomieSedaap.png)
 
-![beda waktu cobae](/images/bedaWaktuCoba.png)
+![beda waktu coba](/images/bedaWaktuCoba.png)

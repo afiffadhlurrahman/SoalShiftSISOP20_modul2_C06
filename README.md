@@ -563,6 +563,28 @@ Untuk melakukan command zip pada folder yang sudah selesai (terisi dengan 20 gam
 }
 ```
 Untuk timer blocking agar membuat folder baru setiap 30 detik. 
+```
+void killer(char mode[]){
+    FILE *fl;
+    fl = fopen("killer.sh", "w");
+```
+Untuk membuat script bash killer
+```
+    fprintf(fl,"rm $0\n");
+    if(strcmp(mode, "-a")==0) fprintf(fl, "#!/bin/bash\nkill -9 -%d", getpid());
+    else if(strcmp(mode, "-b")==0) fprintf(fl, "#!/bin/bash\nkill %d", getpid());
+    int status;
+    pid_t child_id;
+    child_id = fork();
+    if(child_id==0){ 
+        char *argv[] = {"chmod", "u+x", "killer.sh", NULL};
+        execv("/bin/chmod", argv);
+    }
+  
+  fclose(fl);
+}
+```
+Setelah file tersebut dibuat lalu diisi perintah bash untuk kill daemon.
 
 ### Testing soal 2
 #### Soal 2A

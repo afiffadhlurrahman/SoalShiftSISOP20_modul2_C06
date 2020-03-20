@@ -597,6 +597,8 @@ Setelah file tersebut dibuat lalu diisi perintah bash untuk kill daemon.
 ![soal2](/images/soal2c.png)
 #### Soal 2D
 ![soal2](/images/soal2d.png)
+#### Soal 2E
+![soal2](/images/soal2e.png)
 
 ## Soal 3
 Jaya adalah seorang programmer handal mahasiswa informatika. Suatu hari dia

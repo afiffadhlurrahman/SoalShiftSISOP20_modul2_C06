@@ -22,7 +22,7 @@ detik pada jam 07:34.
 
 ### Penyelesaian no.1 
 Soal no1 merupakan program menyerupai crontab dengan menggunakan daemon pada c
-```
+```c
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdio.h>
@@ -125,7 +125,7 @@ program ini menggunakan argumen untuk inputnya (detik,menit,jam,dan path file), 
 
 #### ERROR HANDLING
 argumen yang kita inputkan terdapat 4 buah,yang berupa detik(0-59) atau *(any value), menit(0-59) atau *(any value), jam (0-23) atau *(any value), dan yang terakhir path file bash.sh. Untuk mengatasi kesalahan dalam input, kita bisa melakukan error handling sebagai berikut 
-```
+```c
 if(argc != 5){
         printf("argumen tidak sesuai!\n");
         return 0;
@@ -133,7 +133,7 @@ if(argc != 5){
 ```
 error handling diatas bertujuan agar input yang diberikan haruslah 4, kenapa pada kodingan diatas `argc!=5`? karena argumen pertama berupa `./soal1`, sehingga argumen untuk input mulai pada argumen ke 1-5 (total 4 argumen)
 
-```
+```c
 if(strcmp(argv[1],"*")==0)secBintang=true;
     else sec = atoi(argv[1]);
 
@@ -146,7 +146,7 @@ if(strcmp(argv[3],"*")==0)hourBintang=true;
 pada kodingan diatas, kita merubah argumen menjadi integer dengan menggunakan fungsi `atoi`, kita merubah argumen pertama menjadi detik, argumen kedua menjadi menit, dan argumen ketiga menjadi jam. namun jika inputan berupa `*`, kita tidak merubahnya menjadi integer, melainkan melakukan flaging pada detik/menit/jam yang inputnya berupa `*` tadi.
  
 Kemudian seteah membuat menjadi integer, kita lakukan error handling lagi jika argumen tidak berada pada batasan yang ditentukan seperti berikut.
-```
+```c
 if((sec<0 || sec>59) && !secBintang && check) {
         printf("argumen pertama tidak dalam range (0-59)!\n");
         check=false;
@@ -161,19 +161,19 @@ if((hour<0 || hour>23) && !hourBintang && check) {
     }
 ```
 kemudian jika argumen tidak sesuai, kita ubah `check` menjadi false dan return 0 yang berarti program akan berhenti
-```
+```c
 if(!check) return 0;
 ```
 #### CURRENT TIME
 
 untuk mendapatkan waktu saat ini, kita menggunakan kita fungsi yang terdapat di library `time.h` seperti berikut :
-```
+```c
 time_t currTime = time(NULL);
 struct tm tm = *localtime(&currTime);
 ```
 #### DAEMON PROCESS
 Karena process ini berjalan setiap waktu tertentu ( seperti crontab ), kita perlu menggunakan daemon sebagai process yang berjalan pada background
-```
+```c
 //daemon process begin!--------------------------------------------
     pid_t pid, sid;        // Variabel untuk menyimpan PID
 
@@ -207,7 +207,7 @@ Karena process ini berjalan setiap waktu tertentu ( seperti crontab ), kita perl
 program ini berjalan pada waktu tertenu dengan menggunakan daemon yang berjalan pada background. program ini akan mengecek apakah waktu sudah sesuai dengan konfigurasi cron yang diberikan (dari argumen), Jika sudah sesuai maka program bash akan jalan.
 
 untuk melakukan ini, kita perlu melakukan checking dalam `while(1)` di process daemon dan process checkingnya adalah sebagai berikut,
-```
+```c
 if((tm.tm_hour == hour || hourBintang) && (tm.tm_min == min || minBintang)
           && (tm.tm_sec == sec || secBintang)){
             pid_t child_id1;
@@ -223,12 +223,12 @@ if((tm.tm_hour == hour || hourBintang) && (tm.tm_min == min || minBintang)
 Kita melakukan check apakah jam saat/menit/detik saat ini sama dengan yang kita input pada argumen. dan jika `hourBintang` bernilai true, maka artinya kita telah menginputkan `*` pada konfigurasi jam dan yang berarti akan berjalan tiap jam. ini juga berlaku untuk `minBintang` dan `secBintang`.
 
 Jika semuanya sudah terpenuhi, maka kita bisa mengeksekusi program bash dengan menggunakan `exec`. Namun sebelum melakukan `exec`, kita harus melakukan `fork()` karena seperti yang kita ketahui, `exec` akan membuat program berhenti setelah melakukan eksekusi. Maka dari itu kita harus menjalankannya di child. 
-```
+```c
 pid_t child_id1;
 child_id1 = fork();
 ```
 Setelah ini, kita bisa melakukan fungsi `exec` dalam child `if(child_id1==0)` sebagai berikut
-```
+```c
 execl("/bin/bash","bash",argv[4],NULL);
 ```
 yang berarti kita menjalankan bash script yang pathnya merupakan `argv[4]`.
@@ -277,7 +277,7 @@ tertentu
 - Epoch Unix bisa didapatkan dari time()
 
 ### Penyelesaian no. 2
-```
+```c
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -407,7 +407,7 @@ int main() {
 
 ```
 untuk killernya
-```
+```c
 void killer(char mode[]){
     FILE *fl;
     fl = fopen("killer.sh", "w");
@@ -427,7 +427,7 @@ void killer(char mode[]){
 ```
 
 ### Pembahasan No 2
-```
+```c
 int main(int argc, char **argv) {
 pid_t pid, sid; // Variabel untuk menyimpan PID
 pid = fork(); // Menyimpan PID dari Child Process
@@ -453,7 +453,7 @@ close(STDERR_FILENO);
 ```
 sub program diatas adalah template untuk implementasi daemon
 `killer(argv[1]);` untuk memanggil fungsi killer
-```
+```c
 while (1) {
 pid_t child_id;
 int status;
@@ -461,7 +461,7 @@ char buffer[80];
 char b[]="/home/vincent/praktikum2/";
 ```
 untuk menyimpan directory tujuan untuk hasil dari mkdir
-```
+```c
 time_t rawtime;
 struct tm *info;
 time( &rawtime );
@@ -475,7 +475,7 @@ exit(EXIT_FAILURE);
 }
 ```
 Untuk mengetahui time, yang nantinya akan digunakan sebagai nama directory.
-```
+```c
 if (child_id == 0) {
 	if(fork()==0){
 		char *binaryPath = "/bin/mkdir";
@@ -484,20 +484,20 @@ if (child_id == 0) {
 	}
 ```
 Untuk membuat directory dengan execv (dilakukan fork ketika membuat directory tersebut agar child bisa berproses untuk tugas berikutnya.
-```
+```c
 	else{
 		while ((wait(&status)) > 0);
 		int count=20;
 		while(count>0){
 ```
 untuk memastikan bahwa file yang terdownload berjumlah 20
-```
+```c
 		if (fork() == 0)
 		{
 			chdir(b);
 ```
 Untuk membuka directory yang sudah disimpan dalam array b (dilakukan fork agar child masih dapat melakukan proses berikutnya.
-```
+```c
 			struct tm t;
 			time_t t_of_day;
 			time_t s, val = 1;
@@ -516,17 +516,17 @@ Untuk membuka directory yang sudah disimpan dalam array b (dilakukan fork agar c
 			t_of_day = (t_of_day%1000)+100;
 ```
 Untuk mendapatkan epoch time dan diproses sesuai pada soal.
-```
+```c
 			char destination[1000]="https://picsum.photos/";
 			char buffer1[1000];
 ```
 Untuk mengetahui link mana yang akan di download
-```
+```c
 			sprintf(buffer1,"%ld",(long)t_of_day);
 			strcat(destination,buffer1);
 ```
 Untuk mengetahui ukuran dari pixel gambar (file) dan dilengkapi dengan link yang akan kita akses untuk mendownload.
-```
+```c
 			time_t rawtime;
 			struct tm *info;
 			char name[80];
@@ -541,13 +541,13 @@ Untuk mengetahui ukuran dari pixel gambar (file) dan dilengkapi dengan link yang
 			}
 ```
 Eksekusi download file dengan menggunakan execv dengan command wget dan melakukan penamaan sesuai real time saat gambar (file) itu terdownload.
-```
+```c
 			count--;
 			sleep(5);
 		}
 ```
 Melakukan eksekusi download setiap 5 detik, dan count di kurangi agar bisa tepat 20 file dalam 1 folder
-```
+```c
 		char *binaryPath2 = "/usr/bin/zip";
 		char *argv [] = {binaryPath2,"-rm",b,b, NULL};
 		execv(binaryPath2, argv);
@@ -555,7 +555,7 @@ Melakukan eksekusi download setiap 5 detik, dan count di kurangi agar bisa tepat
 }
 ```
 Untuk melakukan command zip pada folder yang sudah selesai (terisi dengan 20 gambar (file) terdownload).
-```
+```c
 		else{
 			sleep(30);
 		}
@@ -563,13 +563,13 @@ Untuk melakukan command zip pada folder yang sudah selesai (terisi dengan 20 gam
 }
 ```
 Untuk timer blocking agar membuat folder baru setiap 30 detik. 
-```
+```c
 void killer(char mode[]){
     FILE *fl;
     fl = fopen("killer.sh", "w");
 ```
 Untuk membuat script bash killer
-```
+```c
     fprintf(fl,"rm $0\n");
     if(strcmp(mode, "-a")==0) fprintf(fl, "#!/bin/bash\nkill -9 -%d", getpid());
     else if(strcmp(mode, "-b")==0) fprintf(fl, "#!/bin/bash\nkill %d", getpid());
@@ -631,7 +631,7 @@ Catatan :
 - Gunakan exec dan fork
 - Direktori “.” dan “..” tidak termasuk
 ### Penyelesaian no.3
-```
+```c
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -783,18 +783,18 @@ Program ini merupakan program yang membutuhkan forking yang cukup banyak karena 
 
 #### PEMBUATAN 2 DIREKTORI
 Pada process awal, kita menggunakan `fork()` untuk membuat 2 direkotri yaitu indomie dan sedaap.
-```
+```c
 pid_t child_id;
 child_id = fork();
 ```
 Pada tahap ini kita membagi process menjadi parent dan child. Jika `child_id==0` maka itu merupakan childnya. Jika `child_id < 0` maka program akan berhenti karena gagal dalam membuat process
-```
+```c
 if (child_id < 0) {
     exit(EXIT_FAILURE);
 }
 ```
 Kemudian pada child process , kita membuat directory indomie dengan menggunakan `exec`, kemudian dalam parent process kita melakukan wait dengan cara `while ((wait(&status9)) > 0);` dan lakukan `sleep` selama 5 detik dan lakukan `exec` untuk membuat directory seedap. `sleep` dilakukan agar directory seedap terbuat 5 detik setelah directory indomie dibuat 
-```
+```c
 if (child_id == 0) {
          // this is child    
           char *argv[] = {"mkdir", "/home/vincent/modul2/indomie", NULL};
@@ -812,7 +812,7 @@ Process ekstrak ini berhubungan dengan pembuatan directory indomie dan seedap ta
 Setelah 2 directory(indomie dan seedap) tersebut dibuat, program ini harus bisa meng-ekstrak jpg.zip. Hal ini dapat dilakukan dengan melakukan forking lagi yang process `fork()`nya kurang lebih sama dengan yang sebelumnya. yaitu membagi menjadi child process dan parent process. 
 
 dimana child processnya merupakan pembuatan directory tadi (indomie dan seedap), dan parent processnya adalah sebagai berikut,
-```
+```c
 while ((wait(&status3)) > 0);
 char *argv[3] = {"unzip","/home/vincent/modul2/jpg.zip", NULL};
 execv("/usr/bin/unzip", argv);
@@ -823,7 +823,7 @@ fungsi `while ((wait(&status3)) > 0);` untuk menunggu process child jalan,lalu k
 Process ini juga berhubungan dengan 2 process sebelumnya, dimana setelah membuat directory dan mengekstrak jpg.zip, kita memindahkan hasil ekstrak tersebut kedalam directory indomie dan sedap. Jika yang dipindahkan berupa directory, maka kita pindahkan ke directory indomie dan jika yang dipindahkan berupa file, kita pindahkan ke directory seedap.
 
 Pada tahap ini, kita menggunakan forking yang sama juga seperti process sebelumnya yaotu membuat child process dan parent process dimana child processnya adalah process ekstrak sebelumnya dan parent processnya adalah
-```
+```c
 while ((wait(&status2)) > 0);
         char filename[100] ={"/home/vincent/modul2/jpg/"},filename2[100];
         struct dirent *dp;
@@ -859,29 +859,29 @@ while ((wait(&status2)) > 0);
 ![hasil file di Sedaap](/images/jumlahFile.PNG)
 
 disini kita menggunakan dirent dalam library `dirent.h` untuk mengambil file yang terdapat di diretory tertentu. dalam hal ini kita memasukan directory `/home/vincent/modul2/jpg/` untuk mengambil file/ directory dalam directory jpg
-```
+```c
 struct dirent *dp;
 DIR *fd = opendir("/home/vincent/modul2/jpg/");
 ```
 kemudian kita melakukan looping dalam directory jpg tersebut dengan `while((dp = readdir(fd))!=NULL)` dan didalamnya untuk setiap file yang ada kita check dan pindahkan ke directory seedap dan untuk setiap directory yang ada kita pindahkan ke directory indomie. untuk directory `.` dan `..` tidak termasuk maka kita lakukan continue
-```
+```c
 if (!strcmp (dp->d_name, ".")) continue;
 if (!strcmp (dp->d_name, ".."))continue;
 ```
 kemudian kita lakukan strcpy pada nama file yang ingin dipindahkan yaitu `"/home/vincent/modul2/jpg/"` dan lakukan strcat pada file yang ditemukan sehingga terbentuk path baru yang merupakan path file dalam directory jpg. 
-```
+```c
 strcpy(filename2,filename);
 strcat(filename2,dp->d_name);
 ```
 Kemudian kita lakukan `fork()` lagi karena kita mau menggunakan exec. setelah melakukan fork, akan terbagi menjadi child dan parent. pada child process kita bagi untuk directory dan untuk file. Jika yang ingin dipindahkan berupa directory, maka kita pindahkan ke indomie dengan menggunakan exec
-```
+```c
 if(child_id5 == 0 && dp->d_type == 4){
       char *arg4v[] = {"mv",filename2,"/home/vincent/modul2/indomie/",NULL};
       execv("/bin/mv",arg4v);
 }
 ```
 dan jika yang ingin dipindahkan berupa file, kita pindahkan ke seedap dengan
-```
+```c
 if(child_id5 == 0 && dp->d_type == 8){
       char *arg5v[] = {"mv",filename2,"/home/vincent/modul2/sedaap/",NULL};
       execv("/bin/mv",arg5v);
@@ -891,7 +891,7 @@ if(child_id5 == 0 && dp->d_type == 8){
 Terakhir, setelah membuat directory, ekstrak dan memindahkan hasil ekstrak, kita haru membuat 2 file kosong `coba1.txt` dan `coba2.txt` dalam directory yang terdapat di directory indomie. dimana pembuatan file tersebut harus memiliki selang 3 detik.
 
 Untuk melakukan ini, kita harus melakukan process yang sama seperti sebelumnya yaitu forking dengan child processnya adalah memindahkan hasil ekstrak dan parent processnya adalah 
-```
+```c
  while ((wait(&status)) > 0);
         sleep(1);
         char filename3[100] ={"/home/vincent/modul2/indomie/"},filename4[100];
@@ -934,24 +934,24 @@ Untuk melakukan ini, kita harus melakukan process yang sama seperti sebelumnya y
         }
 ```
 pada awalnya kita melakukan wait seperti biasa, lalu kita juga menggunakan dirent untuk bisa mendapatkan file/directory dalam suatu directory, dan sama seperti sebelumnya, kita lakukan looping dalam directory tertentu untuk mendapatkan file/directory dalam directory tersebut. Dalam kasus ini, kita melakukan looping dalam directory indomie
-```
+```c
 DIR *fd = opendir("/home/vincent/modul2/indomie/");
 ```
 dan sama seperti sebelumnya kita tidak perlu directory `.` dan `..` maka kita continue.
 
 Lalu disini, kita melakukan forking lagi karena disini kita berusaha membuat file `coba1.txt` dan 3 detik kemudian membuat file `coba2.txt` dengan menggunakan exec, maka pada child kita melakukan strcpy file dari file `"/home/vincent/modul2/indomie/"` lalu menggunakan strcat menggabungkan directory yang dituju, dan strcat lagi untuk menggabungkan file `/coba1.txt`. setelah dilakukan penggabungan, nnti akan menjadi
-```
+```c
 "/home/vincent/modul2/indomie/[namaDirectory]/coba1.txt"
 ```
 Setelah ini, kita menggunakan execv untuk membuat file
-```
+```c
 char *argv6[] = {"touch",filename4, NULL};
 execv("/usr/bin/touch", argv6); 
 ```
 Kemudian pada parent process, kita gunakan wait dan `sleep(3)` untuk memberi jeda waktu sebanyak 3 detik setelah coba1.txt dibuat.
 
 Dalam parent process ini kita melakukan forking lagi karena kita akan menggunakan exec lagi. process yang dilakukan kurang lebih sama dengan yang sebelumnya. hanya saja, kita membuat file `coba2.txt`. kita juga menggunakan execv untuk membuat file tersebut
-```
+```c
 char *argv7[] = {"touch",filename4, NULL};
 execv("/usr/bin/touch", argv7);
 ```
